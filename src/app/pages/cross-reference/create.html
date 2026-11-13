@@ -1,0 +1,422 @@
+<app-menu></app-menu>
+
+<main
+  class="pt-16 sm:pt-[72px] md:pt-[88px] lg:pt-24 pb-6
+         px-4 md:px-6 transition-all duration-300 animate-page"
+  [ngClass]="{
+    'md:ml-72': isSidebarOpen(),
+    'md:ml-20': !isSidebarOpen()
+  }">
+
+  <div class="max-w-4xl mx-auto">
+
+        <div class="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-6 mt-6">
+
+          <div class="relative">
+            <div class="absolute inset-0 rounded-full bg-cyan-400/20 blur-2xl"></div>
+            <div class="relative p-6 bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-full shadow-lg shadow-cyan-500/20">
+              <svg class="w-14 h-14 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                      d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V7a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+              </svg>
+            </div>
+          </div>
+
+          <div>
+            <h2 class="text-2xl font-bold text-heading">Gestión de Materiales</h2>
+            <p class="text-body max-w-md mt-2">
+              Agrega nuevos números de parte, alternativas y/o equivalencias en un proceso guiado de 3 pasos.
+            </p>
+          </div>
+
+          <button type="button" (click)="openCreateModal()"
+                  class="inline-flex items-center justify-center gap-2 px-6 py-2.5
+                        bg-gradient-to-r from-cyan-500 to-cyan-600 text-white font-semibold
+                        hover:from-cyan-600 hover:to-cyan-700 rounded-xl transition-all
+                        shadow-md shadow-cyan-500/20 hover:shadow-lg hover:shadow-cyan-500/30">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 4v16m8-8H4"/>
+            </svg>
+            Nuevo Material
+          </button>
+
+        </div>
+
+  </div>
+
+</main>
+
+<!-- Modal principal -->
+
+@if (showCreateModal()) {
+<div class="fixed inset-0 z-50 bg-black/70 flex items-start sm:items-center justify-center p-4 sm:p-6 overflow-y-auto">
+  <div class="w-full max-w-3xl lg:max-w-4xl max-h-[90vh] overflow-y-auto bg-neutral-primary-soft rounded-base border border-default-medium shadow-lg" (click)="$event.stopPropagation()">
+
+    <!-- Header -->
+    <div class="p-4 flex items-center justify-between border-b border-default-medium">
+      <div class="block mb-2 text-sm font-semibold text-gray-700">Ingresar Nuevo Material</div>
+      <button type="button"
+        aria-label="Cerrar"
+        class="text-gray-400 bg-white rounded-md hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+        (click)="closeCreateModal()">
+        <span class="sr-only">Cerrar</span>
+        <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Stepper -->
+    <div class="px-4 sm:px-6 pt-5 pb-2">
+      <div class="flex items-center justify-center">
+
+        <!-- Paso 1 -->
+        <button type="button" (click)="goToStep(1)" class="flex flex-col items-center gap-1.5">
+          <div class="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold transition-colors border-2"
+               [class.bg-cyan-500]="currentStep() === 1"
+               [class.border-cyan-500]="currentStep() >= 1"
+               [class.text-white]="currentStep() === 1"
+               [class.bg-white]="currentStep() !== 1"
+               [class.text-cyan-600]="currentStep() > 1"
+               [class.text-gray-400]="currentStep() < 1"
+               [class.border-gray-200]="currentStep() < 1">
+            @if (currentStep() > 1) {
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+              </svg>
+            } @else { 1 }
+          </div>
+          <span class="text-[11px] font-medium" [class.text-cyan-600]="currentStep() >= 1" [class.text-gray-400]="currentStep() < 1">Descripción</span>
+        </button>
+
+        <div class="w-12 sm:w-20 h-0.5 mx-1 sm:mx-2 mt-[-18px]" [class.bg-cyan-500]="currentStep() > 1" [class.bg-gray-200]="currentStep() <= 1"></div>
+
+        <!-- Paso 2 -->
+        <button type="button" (click)="goToStep(2)" class="flex flex-col items-center gap-1.5">
+          <div class="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold transition-colors border-2"
+               [class.bg-cyan-500]="currentStep() === 2"
+               [class.border-cyan-500]="currentStep() >= 2"
+               [class.text-white]="currentStep() === 2"
+               [class.bg-white]="currentStep() !== 2"
+               [class.text-cyan-600]="currentStep() > 2"
+               [class.text-gray-400]="currentStep() < 2"
+               [class.border-gray-200]="currentStep() < 2">
+            @if (currentStep() > 2) {
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+              </svg>
+            } @else { 2 }
+          </div>
+          <span class="text-[11px] font-medium" [class.text-cyan-600]="currentStep() >= 2" [class.text-gray-400]="currentStep() < 2">Alternativas</span>
+        </button>
+
+        <div class="w-12 sm:w-20 h-0.5 mx-1 sm:mx-2 mt-[-18px]" [class.bg-cyan-500]="currentStep() > 2" [class.bg-gray-200]="currentStep() <= 2"></div>
+
+        <!-- Paso 3 -->
+        <button type="button" (click)="goToStep(3)" class="flex flex-col items-center gap-1.5">
+          <div class="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold transition-colors border-2"
+               [class.bg-cyan-500]="currentStep() === 3"
+               [class.border-cyan-500]="currentStep() >= 3"
+               [class.text-white]="currentStep() === 3"
+               [class.bg-white]="currentStep() !== 3"
+               [class.text-gray-400]="currentStep() < 3"
+               [class.border-gray-200]="currentStep() < 3">
+            3
+          </div>
+          <span class="text-[11px] font-medium" [class.text-cyan-600]="currentStep() >= 3" [class.text-gray-400]="currentStep() < 3">Otros</span>
+        </button>
+
+      </div>
+    </div>
+
+    <div class="p-4 sm:p-6 pt-4">
+      <form id="createForm" [formGroup]="createForm" (ngSubmit)="onSubmit()">
+
+        <!--- descripcion --->
+        <div [class.hidden]="currentStep() !== 1" class="space-y-4 min-h-[280px]">
+
+          <div>
+            <label for="numPiezaOem" class="block text-sm text-body mb-1">Número de Parte <span class="text-red-500">*</span></label>
+            <input formControlName="numPiezaOem" id="numPiezaOem" type="text"
+              class="block w-full px-3 py-2 bg-neutral-secondary-medium border border-default-medium text-body text-sm rounded-base focus:ring-brand focus:border-brand shadow-xs" />
+
+            @if (createForm.get('numPiezaOem')?.errors?.['required'] && createForm.get('numPiezaOem')?.touched) {
+              <div role="alert" class="mt-1 text-xs text-red-600">Este campo es requerido.</div>
+            }
+            @if (createForm.get('numPiezaOem')?.errors?.['pattern']) {
+              <div role="alert" class="mt-1 text-xs text-red-600">Ingresa un número de parte válido.</div>
+            }
+          </div>
+
+          <div>
+            <label for="descripcion" class="block text-sm text-body mb-1">Descripción</label>
+            <textarea id="descripcion" formControlName="descripcion" rows="4"
+              class="block w-full px-3 py-2 bg-neutral-secondary-medium border border-default-medium text-body text-sm rounded-base focus:ring-brand focus:border-brand shadow-xs resize-none"></textarea>
+          </div>
+
+        </div>
+
+        <!--- alternativas --->
+        <div [class.hidden]="currentStep() !== 2" class="space-y-4 min-h-[280px]">
+
+          <div>
+            <label class="block text-sm text-body mb-1">Alternativas</label>
+
+            <div class="flex flex-wrap gap-2 min-h-[32px]">
+              @for (alt of alternativas.controls; track $index) {
+                <span
+                  class="relative group/tooltip inline-flex items-center gap-1.5 px-2.5 py-1
+                         rounded-lg text-xs font-medium whitespace-pre
+                         bg-neutral-secondary-medium text-body border border-default-medium"
+                  [class.cursor-help]="!!alt.value?.nota"
+                  [class.bg-cyan-50]="!!alt.value?.nota"
+                  [class.border-cyan-200]="!!alt.value?.nota"
+                  [class.text-cyan-700]="!!alt.value?.nota">
+
+                  {{ alt.value?.nombre }}
+
+                  @if (alt.value?.nota) {
+                    <svg class="w-3.5 h-3.5 text-cyan-500 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                    </svg>
+                    <span
+                      class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2
+                             hidden group-hover/tooltip:flex flex-col items-center z-[999]
+                             opacity-0 group-hover/tooltip:opacity-100 transition-opacity duration-150">
+                      <span class="px-3 py-1.5 text-xs font-medium text-white bg-cyan-600
+                                   rounded-lg shadow-xl whitespace-normal max-w-[220px] text-center">
+                        {{ alt.value?.nota }}
+                      </span>
+                      <span class="w-2 h-2 -mt-1 rotate-45 bg-cyan-600"></span>
+                    </span>
+                  }
+
+                  <button type="button" aria-label="Eliminar alternativa" class="ms-1 text-danger" (click)="removeAlternativa($index)">×</button>
+                </span>
+              } @empty {
+                <span class="text-xs text-body">Aún no hay alternativas agregadas.</span>
+              }
+            </div>
+
+            <div class="mt-3 grid grid-cols-1 md:grid-cols-3 gap-2">
+              <input #altInput type="text"
+                    (input)="altInputError.set(null)"
+                    class="md:col-span-1 px-3 py-2 bg-neutral-secondary-medium border border-default-medium text-body text-sm rounded-base focus:ring-brand focus:border-brand shadow-xs"
+                    placeholder="Alternativa" />
+
+              <input #altNota type="text"
+                class="md:col-span-2 px-3 py-2 bg-neutral-secondary-medium border border-default-medium text-body text-sm rounded-base focus:ring-brand focus:border-brand shadow-xs"
+                placeholder="Nota (opcional)" />
+
+              <button type="button"
+                class="md:col-span-3 inline-flex items-center justify-center gap-2 px-4 py-2 bg-cyan-500 hover:bg-cyan-600 text-white font-medium rounded-base"
+                (click)="onAddAlternativa(altInput, altNota)">
+                Agregar
+              </button>
+            </div>
+
+            @if (altInputError()) {
+              <div role="alert" class="mt-1 text-xs text-red-600">{{ altInputError() }}</div>
+            }
+          </div>
+
+        </div>
+
+        <!--- otros --->
+        <div [class.hidden]="currentStep() !== 3" class="space-y-4 min-h-[280px]">
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+            <div>
+              <label for="valueParts" class="block text-sm text-body mb-1">Value Parts</label>
+              <input formControlName="valueParts" id="valueParts" type="text"
+                class="block w-full px-3 py-2 bg-neutral-secondary-medium border border-default-medium text-body text-sm rounded-base focus:ring-brand focus:border-brand shadow-xs" />
+              @if (createForm.get('valueParts')?.errors?.['pattern']) {
+                <div role="alert" class="mt-1 text-xs text-red-600">Ingresa un número de parte válido.</div>
+              }
+            </div>
+
+            <div>
+              <label for="reman" class="block text-sm text-body mb-1">Reman</label>
+              <input formControlName="reman" id="reman" type="text"
+                class="block w-full px-3 py-2 bg-neutral-secondary-medium border border-default-medium text-body text-sm rounded-base focus:ring-brand focus:border-brand shadow-xs" />
+              @if (createForm.get('reman')?.errors?.['pattern']) {
+                <div role="alert" class="mt-1 text-xs text-red-600">Ingresa un número de parte válido.</div>
+              }
+            </div>
+
+            <div>
+              <label for="dde" class="block text-sm text-body mb-1">DDE</label>
+              <input formControlName="dde" id="dde" type="text"
+                class="block w-full px-3 py-2 bg-neutral-secondary-medium border border-default-medium text-body text-sm rounded-base focus:ring-brand focus:border-brand shadow-xs" />
+              @if (createForm.get('dde')?.errors?.['pattern']) {
+                <div role="alert" class="mt-1 text-xs text-red-600">Ingresa un número de parte válido.</div>
+              }
+            </div>
+
+            <div>
+              <label for="mbf" class="block text-sm text-body mb-1">MBF</label>
+              <input id="mbf" formControlName="mbf" type="text"
+                class="block w-full px-3 py-2 bg-neutral-secondary-medium border border-default-medium text-body text-sm rounded-base focus:ring-brand focus:border-brand shadow-xs" />
+              @if (createForm.get('mbf')?.errors?.['pattern']) {
+                <div role="alert" class="mt-1 text-xs text-red-600">Ingresa un número de parte válido.</div>
+              }
+            </div>
+
+          </div>
+          
+        <div>
+          <label class="block text-sm text-body mb-1">Imagen</label>
+
+          <div class="flex items-center gap-3">
+            <label for="file_input"
+              class="inline-flex items-center gap-2 px-4 py-2 bg-cyan-500 hover:bg-cyan-600 text-white text-sm font-medium rounded-base cursor-pointer transition-colors shrink-0">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3 3-3m-3-8v11"/>
+              </svg>
+              Elegir archivo
+            </label>
+            <input id="file_input" type="file" accept="image/*" (change)="onFileSelected($event)" class="sr-only" />
+
+            @if (selectedFile) {
+              <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 rounded-full text-xs text-gray-600 truncate max-w-[180px]">
+                <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                {{ selectedFile.name }}
+              </span>
+            } @else {
+              <span class="text-xs text-gray-400">Ningún archivo seleccionado</span>
+            }
+          </div>
+        </div>
+            
+
+        </div>
+
+        <!-- navegacion -->
+        <div class="border-default-medium flex gap-2">
+
+          @if (currentStep() === 1) {
+            <button type="button" (click)="closeCreateModal()" [disabled]="isSubmitting()"
+              class="flex-1 inline-flex items-center justify-center px-4 py-2 bg-white text-gray-600 border border-gray-300 rounded-base hover:bg-red-50 hover:text-red-700 hover:border-red-300 disabled:opacity-50">
+              Cancelar
+            </button>
+          } @else {
+            <button type="button" (click)="prevStep()" [disabled]="isSubmitting()"
+              class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 bg-white text-gray-600 border border-gray-300 rounded-base hover:bg-gray-50 disabled:opacity-50">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+              </svg>
+              Atrás
+            </button>
+          }
+
+          @if (currentStep() < totalSteps) {
+            <button type="button" (click)="nextStep()"
+              class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 bg-cyan-500 hover:bg-cyan-600 text-white font-medium rounded-base transition-colors">
+              Siguiente
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+              </svg>
+            </button>
+          } @else {
+            <button type="submit" form="createForm" [disabled]="createForm.invalid || isSubmitting()"
+              class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 bg-cyan-500 hover:bg-cyan-600 text-white font-medium rounded-base disabled:opacity-50 disabled:cursor-not-allowed">
+              @if (isSubmitting()) {
+                Guardando...
+              } @else {
+                Guardar datos
+              }
+            </button>
+          }
+
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+}
+ 
+<!------------------------- Modales ---------------------->
+
+<!-- exito -->
+<app-modal
+  [open]="showSuccessModal()"
+  modalTitle="Operación Exitosa"
+  maxWidth="sm"
+  [dismissOnBackdrop]="true"
+  (closed)="closeSuccessModal()">
+
+  <div class="p-6 text-center">
+    <div class="relative mx-auto flex items-center justify-center h-16 w-16 mb-4">
+      <span class="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-20 animate-ping"></span>
+      <div class="relative flex items-center justify-center h-14 w-14 rounded-full bg-emerald-500">
+        <svg class="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+        </svg>
+      </div>
+    </div>
+
+    <h3 class="text-base font-bold text-gray-800 mb-1">¡Listo!</h3>
+    <p class="text-sm text-gray-500 whitespace-pre-line">
+      {{ successMessage() }}
+    </p>
+
+    @if (createdId()) {
+      <span class="inline-flex items-center gap-1.5 mt-3 px-3 py-1 bg-emerald-50 border border-emerald-200 rounded-full text-xs text-emerald-700">
+        ID generado: <span class="font-mono font-bold">{{ createdId() }}</span>
+      </span>
+    }
+  </div>
+
+  <div footer-actions class="w-full flex justify-center">
+    <button
+      type="button"
+      class="w-full rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-4 py-2.5
+             shadow-md shadow-emerald-500/20 transition-all"
+      (click)="closeSuccessModal()">
+      Aceptar
+    </button>
+  </div>
+
+</app-modal>
+
+
+<!-- error -->
+<app-modal
+  [open]="showErrorModal()"
+  modalTitle="Error"
+  maxWidth="sm"
+  [dismissOnBackdrop]="true"
+  (closed)="closeErrorModal()">
+
+  <div class="p-6 text-center">
+    <div class="relative mx-auto flex items-center justify-center h-16 w-16 mb-4">
+      <span class="absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-20 animate-ping"></span>
+      <div class="relative flex items-center justify-center h-14 w-14 rounded-full bg-red-500">
+        <svg class="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </div>
+    </div>
+
+    <h3 class="text-base font-bold text-gray-800 mb-1">Ocurrió un error</h3>
+    <p class="text-sm text-gray-500 whitespace-pre-line">
+      {{ errorMessage() }}
+    </p>
+  </div>
+
+  <div footer-actions class="w-full flex justify-center">
+    <button
+      type="button"
+      class="w-full rounded-xl bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2.5
+             shadow-md shadow-red-500/20 transition-all"
+      (click)="closeErrorModal()">
+      Cerrar
+    </button>
+  </div>
+
+</app-modal>

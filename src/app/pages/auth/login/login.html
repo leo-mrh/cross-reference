@@ -1,0 +1,142 @@
+<div class="min-h-screen w-full bg-[#f3f4f6] flex flex-col font-sans relative overflow-hidden">
+
+  <!-- Fondo -->
+  <div class="absolute inset-0 z-0 opacity-20 pointer-events-none">
+    <div class="absolute top-[-10%] left-[-10%] w-[120%] h-[120%] transform rotate-12"
+         style="background: repeating-linear-gradient(45deg, transparent, transparent 100px, #FFED00 100px, #FFED00 120px);">
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="relative z-20 bg-black text-white px-6 py-4 flex items-center justify-between border-b border-white/10">
+    <div class="flex items-center"><div class="h-16"></div></div>
+    <div class="absolute left-1/2 -translate-x-1/2 hidden md:block">
+      <h1 class="text-2xl font-serif tracking-wide text-white">Daimler Buses México</h1>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="relative z-10 flex-1 flex items-center justify-center p-4 pb-24">
+    <div class="bg-white w-full max-w-sm md:max-w-5xl shadow-2xl flex flex-col md:flex-row overflow-hidden border border-gray-100 rounded-lg md:rounded-none">
+
+      <!-- Info -->
+      <div class="w-full md:w-1/2 p-5 md:p-8 flex flex-col justify-between border-b md:border-b-0 md:border-r border-gray-100">
+        <h2 class="text-xl font-bold text-black mb-3 tracking-tight">Documentación Técnica Refacciones</h2>
+        <div class="flex flex-col gap-3 text-[10px]">
+          <a href="#" class="font-bold text-black hover:underline underline-offset-2">¿Olvidaste tu contraseña?</a>
+          <a href="#" class="font-bold text-black hover:underline underline-offset-2">Centro de Ayuda</a>
+        </div>
+      </div>
+
+      <!-- Form -->
+      <div class="w-full md:w-1/2 p-5 md:p-8 bg-white">
+        <h2 class="text-xl font-medium text-black mb-2">Login</h2>
+        <p class="text-xs text-gray-500 mb-4">Por favor ingrese sus credenciales para continuar.</p>
+
+        <form #loginForm="ngForm" (submit)="onSubmit($event)" novalidate class="space-y-3">
+
+          <!-- Email -->
+          <div>
+            <label for="email" class="sr-only">Correo electrónico</label>
+            <input
+              id="email"
+              type="email"
+              name="email"
+              autocomplete="username"
+              [(ngModel)]="email"
+              #emailModel="ngModel"
+              required
+              email
+              placeholder="Email"
+              [attr.aria-invalid]="emailModel.invalid && (emailModel.touched || emailModel.dirty)"
+              [attr.aria-describedby]="emailModel.invalid ? 'email-error' : null"
+              class="w-full border-2 border-black p-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 placeholder:text-gray-400"
+            />
+            @if (emailModel.invalid && (emailModel.touched || emailModel.dirty)) {
+              <p id="email-error" role="alert" class="mt-1 text-2xs text-red-600">Email inválido.</p>
+            }
+          </div>
+
+          <!-- Password -->
+          <div class="relative">
+            <label for="password" class="sr-only">Contraseña</label>
+
+            <input
+              id="password"
+              [type]="showPassword ? 'text' : 'password'"
+              name="password"
+              autocomplete="current-password"
+              [(ngModel)]="password"
+              #passwordModel="ngModel"
+              required
+              minlength="8"
+              placeholder="Contraseña"
+              [attr.aria-invalid]="passwordModel.invalid && (passwordModel.touched || passwordModel.dirty)"
+              [attr.aria-describedby]="passwordModel.invalid ? 'password-error' : null"
+              class="w-full border-2 border-black p-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 placeholder:text-gray-400"
+            />
+
+            <!-- Mostrar/ocultar contraseña -->
+            <button
+              type="button"
+              (click)="togglePasswordVisibility()"
+              class="absolute inset-y-0 right-3 flex items-center text-gray-600 hover:text-black"
+              [attr.aria-label]="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+            >
+              @if (!showPassword) {
+                <svg xmlns="http://www.w3.org/2000/svg"
+                     class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+                     stroke-width="2" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M12 5c4.5 0 8.3 3 9.5 7-1.2 4-5 7-9.5 7S3.7 16 2.5 12C3.7 8 7.5 5 12 5z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+              } @else {
+                <svg xmlns="http://www.w3.org/2000/svg"
+                     class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+                     stroke-width="2" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M3 3l18 18M10.6 10.6A3 3 0 0113.4 13.4M6.3 6.3A11.9 11.9 0 0112
+                       5c4.5 0 8.3 3 9.5 7a11.7 11.7 0 01-1.7 3.2m-3.2 2.6A10.8 10.8 0 0112
+                       19c-4.5 0-8.3-3-9.5-7a11.7 11.7 0 012.8-4.9"/>
+                </svg>
+              }
+            </button>
+
+            @if (passwordModel.invalid && (passwordModel.touched || passwordModel.dirty)) {
+              <p id="password-error" role="alert" class="mt-1 text-2xs text-red-600">
+                @if (passwordModel.errors?.['required']) {
+                  La contraseña es obligatoria.
+                } @else if (passwordModel.errors?.['minlength']) {
+                  La contraseña debe tener al menos 8 caracteres.
+                }
+              </p>
+            }
+          </div>
+
+          <!-- Error general -->
+          @if (error) {
+            <div role="alert" class="p-2 bg-red-50 text-red-700 text-2xs border-l-4 border-red-600">
+              {{ error }}
+            </div>
+          }
+
+          <!-- Submit -->
+          <div class="space-y-2 pt-1">
+            <button
+              type="submit"
+              [disabled]="isSubmitting || loginForm.invalid"
+              class="w-full bg-[#FFED00] text-black py-2.5 text-xs font-bold flex justify-center items-center gap-2 hover:bg-yellow-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              @if (isSubmitting) {
+                <div class="w-3.5 h-3.5 border-2 border-black/30 border-t-black rounded-full animate-spin"></div>
+              }
+              <span>{{ isSubmitting ? 'Iniciando...' : 'Iniciar sesión' }}</span>
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </main>
+</div>

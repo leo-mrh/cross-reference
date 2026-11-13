@@ -1,0 +1,794 @@
+<app-menu></app-menu>
+
+<main
+  class="pt-16 sm:pt-[72px] md:pt-[88px] lg:pt-24 pb-6
+         px-4 md:px-8 transition-all duration-300 animate-page"
+  [class.md:ml-72]="isSidebarOpen()"
+  [class.md:ml-20]="!isSidebarOpen()">
+
+  <div class="max-w-7xl mx-auto">
+
+    <!-- Header -->
+    <div class="mt-4 sm:mt-6 mb-6 flex items-center gap-4">
+      <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-cyan-500 to-cyan-700 flex items-center justify-center shrink-0 shadow-md shadow-cyan-500/20">
+        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+        </svg>
+      </div>
+      <div>
+        <h1 class="text-2xl font-bold text-gray-800">Listado de Materiales</h1>
+        <p class="text-sm text-gray-500 mt-0.5">Administra y consulta el catálogo completo de refacciones.</p>
+      </div>
+    </div>
+
+    <!-- Contenedor de tabla -->
+    <div class="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
+
+      <!-- Barra de búsqueda y acciones -->
+      <div class="p-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 border-b border-gray-100">
+
+        <button
+          type="button"
+          aria-label="Abrir menú de navegación"
+          class="inline-flex items-center justify-center p-2 rounded-xl text-gray-600 hover:bg-gray-100 focus:outline-none transition-colors md:hidden"
+          (click)="toggleSidebar()">
+          <svg aria-hidden="true" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+
+        <label for="input-group-1" class="sr-only">Buscar</label>
+        <div class="relative flex-1">
+          <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+            <svg class="w-4 h-4 text-gray-400" aria-hidden="true" fill="none" viewBox="0 0 24 24">
+              <path stroke="currentColor" stroke-linecap="round" stroke-width="2"
+                d="m21 21-3.5-3.5M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z" />
+            </svg>
+          </div>
+          <input type="text" id="input-group-1" (input)="onSearch($any($event.target).value)" [value]="searchTerm()"
+            class="block w-full ps-9 pe-3 py-2.5 bg-gray-50 border border-gray-200 text-gray-800 text-sm rounded-xl
+                   focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 outline-none placeholder:text-gray-400 transition-shadow"
+            placeholder="Buscar por número de parte, descripción...">
+        </div>
+
+        <div class="relative inline-flex gap-2" role="group">
+          <button type="button"
+            class="inline-flex items-center gap-1.5 text-gray-400 bg-gray-50 border border-gray-200
+                   font-medium text-sm px-3 py-2.5 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled>
+            <svg class="w-4 h-4" aria-hidden="true" fill="none" viewBox="0 0 24 24">
+              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M10 3v4a1 1 0 0 1-1 1H5m4 8h6m-6-4h6m4-8v16a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V7.914a1 1 0 0 1 .293-.707l3.914-3.914A1 1 0 0 1 9.914 3H18a1 1 0 0 1 1 1Z" />
+            </svg>
+            Reportes
+          </button>
+
+          <button type="button" (click)="downloadExcel()"
+            class="inline-flex items-center gap-1.5 text-gray-600 bg-gray-50 border border-gray-200 hover:bg-gray-100
+                   font-medium text-sm px-3 py-2.5 rounded-xl transition-colors">
+            <svg class="w-4 h-4" aria-hidden="true" fill="none" viewBox="0 0 24 24">
+              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 13V4M7 14H5a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4a1 1 0 0 0-1-1h-2m-1-5-4 5-4-5m9 8h.01" />
+            </svg>
+            Descargar
+          </button>
+
+          <button id="dropdownOptions" (click)="toggleOptions()" type="button"
+            [attr.aria-expanded]="showOptions()"
+            aria-haspopup="true"
+            aria-controls="dropdown-options"
+            class="text-gray-600 bg-gray-50 border border-gray-200 hover:bg-gray-100
+                   font-medium text-sm px-3 py-2.5 rounded-xl transition-colors">
+            <svg class="w-4 h-4" aria-hidden="true" fill="none" viewBox="0 0 24 24">
+              <path stroke="currentColor" stroke-linecap="round" stroke-width="3" d="M6 12h.01m6 0h.01m5.99 0h.01" />
+            </svg>
+          </button>
+
+          <div id="dropdown-options" [class.hidden]="!showOptions()"
+            role="menu"
+            aria-labelledby="dropdownOptions"
+            class="absolute right-0 top-full mt-2 z-10 bg-white border border-gray-100 rounded-2xl shadow-lg w-80">
+            <div class="p-4 text-sm text-gray-600 font-medium space-y-2">
+              <div class="text-xs text-gray-400">
+                Total disponible (con filtros): {{ exportTotalAvailable() }}
+              </div>
+
+              <label class="flex items-center gap-2 p-2 rounded-xl hover:bg-gray-50 cursor-pointer">
+                <input type="radio" name="exportScope" [checked]="exportScope() === 'page'"
+                  (change)="setExportScope('page')" />
+                <span>Página actual ({{ paginated().length }})</span>
+              </label>
+
+              <label class="flex items-center gap-2 p-2 rounded-xl hover:bg-gray-50 cursor-pointer">
+                <input type="radio" name="exportScope" [checked]="exportScope() === 'n'"
+                  (change)="setExportScope('n')" />
+                <span>N registros…</span>
+              </label>
+
+              <div class="px-2">
+                <input type="number" min="1" [max]="exportTotalAvailable()" [disabled]="exportScope() !== 'n'"
+                  (input)="onExportNInput($any($event.target).value)" [value]="exportN() ?? ''"
+                  class="block w-full px-3 py-2 bg-gray-50 border border-gray-200 text-gray-800 text-sm rounded-xl
+                         focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 outline-none"
+                  placeholder="Ej. 1000" />
+                @if (exportScope() === 'n' && (!exportN() || exportN()! <= 0 || exportN()! > exportTotalAvailable())) {
+                  <div role="alert" class="mt-1 text-xs text-red-600">
+                    Ingresa un número entre 1 y {{ exportTotalAvailable() }}.
+                  </div>
+                }
+              </div>
+
+              <label class="flex items-center gap-2 p-2 rounded-xl hover:bg-gray-50 cursor-pointer">
+                <input type="radio" name="exportScope" [checked]="exportScope() === 'all'"
+                  (change)="setExportScope('all')" />
+                <span>Todos</span>
+              </label>
+
+              <div class="text-xs text-gray-400 px-2">
+                Seleccionados: {{ exportSelectedCount() }}. Si filas &gt; {{ exportClientMaxRows }}, se exporta vía servidor.
+              </div>
+
+              @if (exportError()) {
+                <div role="alert" class="text-xs text-red-600 px-2">
+                  {{ exportError() }}
+                </div>
+              }
+
+              <div class="pt-2 flex gap-2">
+                <button type="button" (click)="exportPDF()" [disabled]="exportBusy()"
+                  class="flex-1 inline-flex items-center justify-center p-2 bg-gray-50 hover:bg-gray-100 rounded-xl text-gray-700 disabled:opacity-50 transition-colors">
+                  PDF
+                </button>
+                <button type="button" (click)="exportExcel()" [disabled]="exportBusy()"
+                  class="flex-1 inline-flex items-center justify-center p-2 bg-gray-50 hover:bg-gray-100 rounded-xl text-gray-700 disabled:opacity-50 transition-colors">
+                  Excel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabla -->
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm text-left text-gray-600">
+          <thead class="text-xs uppercase tracking-wide bg-cyan-50 text-cyan-700">
+            <tr>
+              <th scope="col" class="px-6 py-3 font-semibold">Número de Parte</th>
+              <th scope="col" class="px-6 py-3 font-semibold">Alternativa (s)</th>
+              <th scope="col" class="px-6 py-3 font-semibold">Descripción</th>
+              <th scope="col" class="px-6 py-3 font-semibold text-center">Imagen</th>
+              <th scope="col" class="px-6 py-3 font-semibold">Acciones</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            @for (r of paginated(); track r.id) {
+            <tr class="hover:bg-cyan-50/40 transition-colors">
+              <td class="px-6 py-4 font-mono font-semibold text-gray-800 whitespace-pre">{{ r.numPiezaOem }}</td>
+              <td class="px-6 py-4">
+                <div class="flex flex-wrap gap-1.5">
+                  @for (alt of r.alternativas; track alt.id) {
+                    <span
+                      class="relative group/tooltip inline-flex items-center gap-1.5 px-2.5 py-1
+                             rounded-lg text-[12px] font-medium whitespace-pre
+                             bg-gray-50 text-gray-600 border border-gray-200
+                             hover:bg-gray-100 transition-colors"
+                      [class.cursor-help]="hasNota(alt.nota)"
+                      [class.bg-cyan-50]="hasNota(alt.nota)"
+                      [class.border-cyan-200]="hasNota(alt.nota)"
+                      [class.text-cyan-700]="hasNota(alt.nota)">
+
+                      {{ alt.nombre }}
+
+                      @if (hasNota(alt.nota)) {
+                        <svg class="w-3.5 h-3.5 text-cyan-500 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                        </svg>
+                        <span
+                          class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2
+                                 hidden group-hover/tooltip:flex flex-col items-center z-[999]
+                                 opacity-0 group-hover/tooltip:opacity-100 transition-opacity duration-150">
+                          <span class="px-3 py-1.5 text-xs font-medium text-white bg-cyan-600
+                                       rounded-lg shadow-xl whitespace-normal max-w-[220px] text-center">
+                            {{ formatNota(alt.nota) }}
+                          </span>
+                          <span class="w-2 h-2 -mt-1 rotate-45 bg-cyan-600"></span>
+                        </span>
+                      }
+                    </span>
+                  } @empty {
+                    <span class="text-xs text-gray-300 italic">—</span>
+                  }
+                </div>
+              </td>
+              <td class="px-6 py-4 text-gray-600 max-w-xs truncate">{{ r.descripcion || '—' }}</td>
+              <td class="px-6 py-4 text-center">
+                @if (r.imagen) {
+                <img [src]="r.imagen" alt="imagen" (click)="openImage(r.imagen)"
+                  class="h-10 w-10 object-cover rounded-lg cursor-zoom-in mx-auto border border-gray-100 hover:border-cyan-200 transition-colors" />
+                } @else {
+                <span class="text-gray-300">—</span>
+                }
+              </td>
+              <td class="px-6 py-4">
+                <div class="flex items-center gap-2">
+  <button type="button" (click)="openViewModal(r)"
+    class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-cyan-700
+           bg-cyan-50 hover:bg-cyan-100 rounded-lg transition-colors">
+    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+    </svg>
+    Ver
+  </button>
+  <button type="button" (click)="openEditModal(r)"
+    class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-gray-600
+           bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">
+    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5" />
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+    </svg>
+    Editar
+  </button>
+</div>
+              </td>
+            </tr>
+            } @empty {
+            <tr>
+              <td colspan="5" class="px-6 py-16 text-center">
+                <div class="flex flex-col items-center gap-3 text-gray-400">
+                  <div class="w-14 h-14 rounded-2xl bg-gray-50 flex items-center justify-center">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                  </div>
+                  <p class="text-sm font-semibold text-gray-500">No se encontraron resultados</p>
+                  <p class="text-xs text-gray-400">Intenta con otro término de búsqueda</p>
+                </div>
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Paginación -->
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 py-3 border-t border-gray-100">
+        <div class="text-sm text-gray-500">Mostrando {{ range().start }}–{{ range().end }} de {{ range().total }} registros.</div>
+        <div class="inline-flex gap-1.5">
+          <button (click)="firstPage()"
+            class="px-3 py-2 text-sm font-medium rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            [disabled]="page() === 1">Primera</button>
+          <button (click)="prevPage()"
+            class="px-3 py-2 text-sm font-medium rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            [disabled]="page() === 1">Anterior</button>
+          <span class="px-3 py-2 text-sm font-medium text-gray-500">Página {{ page() }} de {{ pageCount() }}</span>
+          <button (click)="nextPage()"
+            class="px-3 py-2 text-sm font-medium rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            [disabled]="page() === pageCount()">Siguiente</button>
+          <button (click)="lastPage()"
+            class="px-3 py-2 text-sm font-medium rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            [disabled]="page() === pageCount()">Última</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<!-- Modal: Imagen ampliada -->
+@if (selectedImage()) {
+<div class="fixed inset-0 z-50 bg-black/70 flex items-center justify-center" (click)="closeImage()">
+  <button
+    type="button"
+    aria-label="Cerrar imagen"
+    class="absolute top-4 right-4 text-white bg-black/40 hover:bg-black/60 rounded-full p-2 transition-colors"
+    (click)="closeImage()">
+    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+    </svg>
+  </button>
+  <img [src]="selectedImage()!" alt="imagen ampliada"
+    class="max-h-[80vh] max-w-[90vw] object-contain rounded-2xl shadow-lg" (click)="$event.stopPropagation()" />
+</div>
+}
+
+<!-- Modal: Operación exitosa -->
+<app-modal
+  [open]="editSavedModalOpen()"
+  modalTitle="Operación exitosa"
+  maxWidth="sm"
+  [dismissOnBackdrop]="true"
+  [zIndex]="60"
+  (closed)="closeEditSavedModal()">
+
+  <div class="p-6 text-center">
+    <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-emerald-100 mb-4">
+      <svg class="h-6 w-6 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M5 13l4 4L19 7" />
+      </svg>
+    </div>
+    <p class="text-sm text-gray-600">Datos guardados exitosamente</p>
+  </div>
+
+  <div footer-actions class="w-full flex justify-center">
+    <button
+      type="button"
+      class="rounded-xl bg-gradient-to-r from-cyan-500 to-cyan-600 text-white font-semibold px-5 py-2.5
+             hover:from-cyan-600 hover:to-cyan-700 shadow-md shadow-cyan-500/20 transition-all"
+      (click)="closeEditSavedModal()">
+      Aceptar
+    </button>
+  </div>
+</app-modal>
+
+<!-- Modal: Ver detalle -->
+@if (viewOpen() && viewingItem()) {
+<div class="fixed inset-0 z-50 bg-black/70 flex items-start sm:items-center justify-center p-4 sm:p-6 overflow-y-auto backdrop-blur-sm">
+  <div class="w-full max-w-3xl lg:max-w-4xl max-h-[90vh] overflow-y-auto bg-white rounded-3xl shadow-2xl" (click)="$event.stopPropagation()">
+
+    <!-- Header con gradiente -->
+    <div class="relative bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-t-3xl px-6 py-5 text-white">
+      <button type="button"
+        aria-label="Cerrar"
+        class="absolute top-4 right-4 text-white/80 hover:text-white hover:bg-white/10 rounded-lg p-1.5 focus:outline-none focus:ring-2 focus:ring-white/40 transition-colors"
+        (click)="closeViewModal()">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 rounded-2xl bg-white/15 flex items-center justify-center shrink-0">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+        </div>
+        <div>
+          <p class="text-xs text-cyan-100 uppercase tracking-wide font-semibold">Detalle de Material</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="p-6 space-y-5">
+      <div>
+            <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Número de parte</p>
+             <p class="text-lg font-bold font-mono whitespace-pre">{{ viewingItem()!.numPiezaOem }}</p>
+      </div>
+       <!-- Alternativas -->
+      <div>
+        <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Alternativas</p>
+        <div class="flex flex-wrap gap-1.5">
+          @if (viewingItem()!.alternativas && viewingItem()!.alternativas.length) {
+            @for (alt of viewingItem()!.alternativas; track alt.id ?? alt.nombre) {
+              <span class="bg-cyan-50 text-cyan-700 px-2.5 py-1 rounded-lg text-xs font-medium whitespace-pre border border-cyan-100">{{ alt.nombre }}</span>
+            }
+          } @else {
+            <span class="text-xs text-gray-300 italic">Sin alternativas registradas</span>
+          }
+        </div>
+      </div>
+
+      <!-- Descripción -->
+      <div class="bg-gray-50 rounded-2xl p-4">
+        <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1">Descripción</p>
+        <p class="text-sm text-gray-700 leading-relaxed">{{ viewingItem()!.descripcion || 'Sin descripción disponible' }}</p>
+      </div>
+
+      <!-- Campos técnicos en grid de tarjetas -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        @if (viewingItem()!.valueParts) {
+          <div class="bg-gray-50 rounded-xl p-3 text-center">
+            <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1">Value Parts</p>
+            <p class="text-sm font-semibold text-gray-800">{{ viewingItem()!.valueParts }}</p>
+          </div>
+        }
+        @if (viewingItem()!.reman) {
+          <div class="bg-gray-50 rounded-xl p-3 text-center">
+            <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1">Reman</p>
+            <p class="text-sm font-semibold text-gray-800">{{ viewingItem()!.reman }}</p>
+          </div>
+        }
+        @if (viewingItem()!.dde) {
+          <div class="bg-gray-50 rounded-xl p-3 text-center">
+            <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1">DDE</p>
+            <p class="text-sm font-semibold text-gray-800">{{ viewingItem()!.dde }}</p>
+          </div>
+        }
+        @if (viewingItem()!.mbf) {
+          <div class="bg-gray-50 rounded-xl p-3 text-center">
+            <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1">MBF</p>
+            <p class="text-sm font-semibold text-gray-800">{{ viewingItem()!.mbf }}</p>
+          </div>
+        }
+      </div>
+
+      <!-- Imagen -->
+      <div>
+        <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Imagen</p>
+        @if (viewingItem()!.imagen) {
+          <img [src]="viewingItem()!.imagen!" alt="imagen" class="max-h-64 w-auto object-contain rounded-2xl border border-gray-100 mx-auto" />
+        } @else {
+          <div class="bg-gray-50 rounded-2xl py-8 text-center">
+            <p class="text-sm text-gray-400">Sin imagen disponible</p>
+          </div>
+        }
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="px-6 py-4 border-t border-gray-100 flex justify-end">
+      <button type="button" (click)="closeViewModal()"
+        class="px-5 py-2.5 text-sm font-semibold text-gray-600 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors">
+        Cerrar
+      </button>
+    </div>
+
+  </div>
+</div>
+}
+<!-- Modal: Confirmar eliminación de alternativa -->
+<app-modal
+  [open]="deleteAltConfirmOpen()"
+  modalTitle="Confirmar eliminación"
+  maxWidth="sm"
+  [dismissOnBackdrop]="false"
+  [zIndex]="60"
+  (closed)="closeDeleteAltConfirm()">
+
+  <div class="p-6 text-center">
+    <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+      <svg class="h-7 w-7 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 13V8m0 8h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+      </svg>
+    </div>
+
+    @if (deleteAltConfirmLabel()) {
+      <p class="text-sm text-gray-600 mb-1">¿Deseas eliminar la alternativa?</p>
+      <p class="text-sm font-semibold text-gray-800 whitespace-pre">{{ deleteAltConfirmLabel() }}</p>
+    } @else {
+      <p class="text-sm text-gray-600">¿Deseas eliminar esta alternativa?</p>
+    }
+  </div>
+
+  <div footer-actions class="w-full flex justify-center gap-2">
+    <button
+      type="button"
+      class="rounded-xl bg-red-500 hover:bg-red-600 text-white font-medium px-4 py-2.5 transition-colors"
+      (click)="confirmDeleteAlt()">
+      Sí, eliminar
+    </button>
+    <button
+      type="button"
+      class="rounded-xl bg-white border border-gray-300 text-gray-600 font-medium px-4 py-2.5 hover:bg-gray-50 transition-colors"
+      (click)="closeDeleteAltConfirm()">
+      No, cancelar
+    </button>
+  </div>
+</app-modal>
+
+<!-- Modal: Editar Material -->
+@if (editOpen()) {
+<div class="fixed inset-0 z-50 bg-black/70 flex items-start sm:items-center justify-center p-4 sm:p-6 overflow-y-auto"
+     role="dialog"
+     aria-modal="true"
+     aria-labelledby="edit-modal-title"
+     (keydown.escape)="closeEditModal()">
+  <div class="w-full max-w-3xl lg:max-w-4xl max-h-[90vh] overflow-y-auto bg-neutral-primary-soft rounded-base border border-default-medium shadow-lg" (click)="$event.stopPropagation()">
+
+    <div class="p-4 flex items-center justify-between border-b border-default-medium">
+      <div id="edit-modal-title" class="block mb-2 text-sm font-semibold text-gray-700">Editar Material</div>
+      <button type="button"
+        aria-label="Cerrar"
+        class="text-gray-400 bg-white rounded-md hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+        (click)="closeEditModal()">
+        <span class="sr-only">Cerrar</span>
+        <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- ================== INDICADOR DE PASOS ================== -->
+    <div class="px-4 sm:px-6 pt-5 pb-2">
+      <div class="flex items-center">
+
+        <!-- Paso 1 -->
+        <button type="button" (click)="goToStep(1)"
+          class="flex items-center gap-2 focus:outline-none">
+          <span class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shrink-0 transition-colors"
+            [class.bg-cyan-500]="editStep() >= 1"
+            [class.text-white]="editStep() >= 1"
+            [class.bg-neutral-secondary-medium]="editStep() < 1"
+            [class.text-body]="editStep() < 1">1</span>
+          <span class="text-sm font-medium hidden sm:inline"
+            [class.text-heading]="editStep() === 1"
+            [class.text-body]="editStep() !== 1">Datos generales</span>
+        </button>
+
+        <div class="flex-1 h-0.5 mx-2 sm:mx-3 transition-colors"
+          [class.bg-cyan-500]="editStep() >= 2"
+          [class.bg-neutral-secondary-medium]="editStep() < 2"></div>
+
+        <!-- Paso 2 -->
+        <button type="button" (click)="goToStep(2)"
+          class="flex items-center gap-2 focus:outline-none">
+          <span class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shrink-0 transition-colors"
+            [class.bg-cyan-500]="editStep() >= 2"
+            [class.text-white]="editStep() >= 2"
+            [class.bg-neutral-secondary-medium]="editStep() < 2"
+            [class.text-body]="editStep() < 2">2</span>
+          <span class="text-sm font-medium hidden sm:inline"
+            [class.text-heading]="editStep() === 2"
+            [class.text-body]="editStep() !== 2">Alternativas</span>
+        </button>
+
+        <div class="flex-1 h-0.5 mx-2 sm:mx-3 transition-colors"
+          [class.bg-cyan-500]="editStep() >= 3"
+          [class.bg-neutral-secondary-medium]="editStep() < 3"></div>
+
+        <!-- Paso 3 -->
+        <button type="button" (click)="goToStep(3)"
+          class="flex items-center gap-2 focus:outline-none">
+          <span class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shrink-0 transition-colors"
+            [class.bg-cyan-500]="editStep() >= 3"
+            [class.text-white]="editStep() >= 3"
+            [class.bg-neutral-secondary-medium]="editStep() < 3"
+            [class.text-body]="editStep() < 3">3</span>
+          <span class="text-sm font-medium hidden sm:inline"
+            [class.text-heading]="editStep() === 3"
+            [class.text-body]="editStep() !== 3">Otros</span>
+        </button>
+
+      </div>
+    </div>
+
+    <div class="p-4 sm:p-6 space-y-4">
+
+      <fieldset [disabled]="editBusy()" class="space-y-4">
+
+        <!-- ================== PASO 1: Datos generales ================== -->
+        @if (editStep() === 1) {
+          <div>
+            <label for="edit-numPiezaOem" class="block text-sm text-body mb-1">Número de Parte</label>
+            <input id="edit-numPiezaOem" type="text" [value]="editNumPiezaOem()" (input)="editNumPiezaOem.set($any($event.target).value)"
+              class="block w-full px-3 py-2 bg-neutral-secondary-medium border border-default-medium text-body text-sm rounded-base
+                     focus:ring-brand focus:border-brand shadow-xs disabled:opacity-60 disabled:cursor-not-allowed" />
+            @if (!editNumPiezaOem().trim()) {
+              <div role="alert" class="mt-1 text-xs text-red-600">Campo requerido.</div>
+            }
+          </div>
+
+          <div>
+            <label for="edit-descripcion" class="block text-sm text-body mb-1">Descripción</label>
+            <textarea id="edit-descripcion" rows="4" [value]="editDescripcion()" (input)="editDescripcion.set($any($event.target).value)"
+              class="block w-full px-3 py-2 bg-neutral-secondary-medium border border-default-medium text-body text-sm rounded-base
+                     focus:ring-brand focus:border-brand shadow-xs disabled:opacity-60 disabled:cursor-not-allowed"></textarea>
+            @if (!editDescripcion().trim()) {
+              <div role="alert" class="mt-1 text-xs text-red-600">Campo requerido.</div>
+            }
+          </div>
+        }
+
+        <!-- ================== PASO 2: Alternativas ================== -->
+        @if (editStep() === 2) {
+          <div>
+            <label id="edit-alternativas-label" class="block text-sm text-body mb-1">Alternativas</label>
+
+            <div class="flex flex-wrap gap-2">
+              @for (alt of editAlternativas(); track alt.nombre; let i = $index) {
+                <span
+                  class="relative group/tooltip inline-flex items-center gap-1 px-2 py-0.5
+                         rounded text-xs whitespace-pre
+                         bg-neutral-secondary-medium border border-default-medium
+                         cursor-move select-none"
+                  [class.ring-2]="dragOverAltIndex() === i"
+                  [class.ring-cyan-500]="dragOverAltIndex() === i"
+                  [class.opacity-70]="draggingAltIndex() === i"
+                  draggable="true"
+                  (dragstart)="onAltDragStart(i)"
+                  (dragover)="onAltDragOver($event, i)"
+                  (drop)="onAltDrop($event, i)"
+                  (dragend)="onAltDragEnd()">
+
+                  <span>{{ alt.nombre }}</span>
+
+                  <button type="button"
+                    (mousedown)="$event.stopPropagation()"
+                    aria-label="Mover alternativa hacia arriba"
+                    [disabled]="i === 0"
+                    class="ms-1 text-body hover:text-fg-brand disabled:opacity-30 disabled:cursor-not-allowed"
+                    (click)="moveAltUp(i)">↑</button>
+
+                  <button type="button"
+                    (mousedown)="$event.stopPropagation()"
+                    aria-label="Mover alternativa hacia abajo"
+                    [disabled]="i === editAlternativas().length - 1"
+                    class="text-body hover:text-fg-brand disabled:opacity-30 disabled:cursor-not-allowed"
+                    (click)="moveAltDown(i)">↓</button>
+
+                  <button type="button"
+                    (mousedown)="$event.stopPropagation()"
+                    aria-label="Editar alternativa"
+                    class="ms-1 text-fg-brand"
+                    (click)="startEditAlternativa(i)">✎</button>
+                  <button type="button"
+                    (mousedown)="$event.stopPropagation()"
+                    aria-label="Eliminar alternativa"
+                    class="ms-1 text-danger"
+                    (click)="confirmRemoveEditAlternativa(i)">x</button>
+
+                  @if (alt.nota) {
+                    <svg class="w-3.5 h-3.5 text-cyan-500 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                    </svg>
+                    <span
+                      class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2
+                             hidden group-hover/tooltip:flex flex-col items-center z-[999]
+                             opacity-0 group-hover/tooltip:opacity-100 transition-opacity duration-150">
+                      <span class="px-3 py-1.5 text-xs font-medium text-white bg-cyan-600
+                                   rounded-lg shadow-xl whitespace-normal max-w-[220px] text-center">
+                        {{ alt.nota }}
+                      </span>
+                      <span class="w-2 h-2 -mt-1 rotate-45 bg-cyan-600"></span>
+                    </span>
+                  }
+                </span>
+              } @empty {
+                <span class="text-xs text-body">—</span>
+              }
+            </div>
+
+            <div class="mt-2 grid grid-cols-1 md:grid-cols-3 gap-2">
+              <label for="edit-altDraft" class="sr-only">Nueva alternativa</label>
+              <input id="edit-altDraft" type="text" [value]="editAltDraft()" (input)="editAltDraft.set($any($event.target).value)"
+                class="md:col-span-1 px-3 py-2 bg-neutral-secondary-medium border border-default-medium text-body text-sm rounded-base
+                       focus:ring-brand focus:border-brand shadow-xs disabled:opacity-60 disabled:cursor-not-allowed"
+                placeholder="Alternativa" />
+
+              <label for="edit-altNotaDraft" class="sr-only">Nota de la alternativa (opcional)</label>
+              <input id="edit-altNotaDraft" type="text" [value]="editAltNotaDraft()" (input)="editAltNotaDraft.set($any($event.target).value)"
+                class="md:col-span-2 px-3 py-2 bg-neutral-secondary-medium border border-default-medium text-body text-sm rounded-base
+                       focus:ring-brand focus:border-brand shadow-xs disabled:opacity-60 disabled:cursor-not-allowed"
+                placeholder="Nota (opcional)" />
+
+              <div class="md:col-span-3 flex gap-2">
+                <button type="button" (click)="addEditAlternativa()"
+                  [disabled]="!editAltDraft().trim()"
+                  class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 bg-cyan-500 hover:bg-cyan-600 text-white font-medium rounded-base
+                         disabled:opacity-50 disabled:cursor-not-allowed">
+                  @if (editingAltIndex() === null) { Agregar } @else { Actualizar }
+                </button>
+                @if (editingAltIndex() !== null) {
+                  <button type="button" (click)="cancelEditAlternativa()"
+                    class="inline-flex items-center justify-center px-4 py-2 bg-white text-gray-600 border border-gray-300 rounded-base
+                           hover:bg-red-50 hover:text-red-700 hover:border-red-300">
+                    Cancelar
+                  </button>
+                }
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- ================== PASO 3: Otros e imagen ================== -->
+        @if (editStep() === 3) {
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+            <div>
+              <label for="edit-valueParts" class="block text-sm text-body mb-1">Value Parts</label>
+              <input id="edit-valueParts" type="text" [value]="editValueParts()" (input)="editValueParts.set($any($event.target).value)"
+                class="block w-full px-3 py-2 bg-neutral-secondary-medium border border-default-medium text-body text-sm rounded-base
+                       focus:ring-brand focus:border-brand shadow-xs disabled:opacity-60 disabled:cursor-not-allowed" />
+            </div>
+
+            <div>
+              <label for="edit-reman" class="block text-sm text-body mb-1">Reman</label>
+              <input id="edit-reman" type="text" [value]="editReman()" (input)="editReman.set($any($event.target).value)"
+                class="block w-full px-3 py-2 bg-neutral-secondary-medium border border-default-medium text-body text-sm rounded-base
+                       focus:ring-brand focus:border-brand shadow-xs disabled:opacity-60 disabled:cursor-not-allowed" />
+            </div>
+
+            <div>
+              <label for="edit-dde" class="block text-sm text-body mb-1">DDE</label>
+              <input id="edit-dde" type="text" [value]="editDde()" (input)="editDde.set($any($event.target).value)"
+                class="block w-full px-3 py-2 bg-neutral-secondary-medium border border-default-medium text-body text-sm rounded-base
+                       focus:ring-brand focus:border-brand shadow-xs disabled:opacity-60 disabled:cursor-not-allowed" />
+            </div>
+
+            <div>
+              <label for="edit-mbf" class="block text-sm text-body mb-1">MBF</label>
+              <input id="edit-mbf" type="text" [value]="editMbf()" (input)="editMbf.set($any($event.target).value)"
+                class="block w-full px-3 py-2 bg-neutral-secondary-medium border border-default-medium text-body text-sm rounded-base
+                       focus:ring-brand focus:border-brand shadow-xs disabled:opacity-60 disabled:cursor-not-allowed" />
+            </div>
+
+          </div>
+
+          <div>
+            <label class="block mb-2 text-sm font-semibold text-gray-700">Imagen</label>
+
+            <div class="flex items-center gap-3">
+              <label for="edit-imagen"
+                class="inline-flex items-center gap-2 px-4 py-2 bg-cyan-500 hover:bg-cyan-600 text-white text-sm font-medium rounded-base cursor-pointer transition-colors shrink-0">
+                <svg aria-hidden="true" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3 3-3m-3-8v11"/>
+                </svg>
+                Elegir archivo
+              </label>
+              <input id="edit-imagen" type="file" accept="image/*" (change)="onEditFileSelected($event)" class="sr-only" />
+
+              @if (editImagenFile()) {
+                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 rounded-full text-xs text-gray-600 truncate max-w-[180px]">
+                  <svg aria-hidden="true" class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                  </svg>
+                  {{ editImagenFile()!.name }}
+                  <button type="button" (mousedown)="$event.stopPropagation()" aria-label="Quitar archivo seleccionado"
+                    class="ms-1 text-gray-400 hover:text-red-500" (click)="clearEditImagenFile()">×</button>
+                </span>
+              } @else if (editImagenUrl()) {
+                <span class="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-100 rounded-full text-xs text-gray-600">
+                  <img [src]="editImagenUrl()" alt="Imagen actual" class="h-5 w-5 object-cover rounded-full" />
+                  Imagen actual
+                </span>
+              } @else {
+                <span class="text-xs text-gray-400">Ningún archivo seleccionado</span>
+              }
+            </div>
+          </div>
+        }
+
+        @if (editError()) {
+          <div role="alert" class="text-sm text-red-600">{{ editError() }}</div>
+        }
+
+      </fieldset>
+
+      <!-- ================== NAVEGACIÓN ================== -->
+      <div class="pt-2 flex gap-2">
+
+        @if (editStep() === 1) {
+          <button type="button" (click)="closeEditModal()" [disabled]="editBusy()"
+            class="flex-1 inline-flex items-center justify-center px-4 py-2 bg-white text-gray-600 border border-gray-300 rounded-base
+                   hover:bg-red-50 hover:text-red-700 hover:border-red-300 disabled:opacity-50 disabled:cursor-not-allowed">
+            Cancelar
+          </button>
+        } @else {
+          <button type="button" (click)="prevStep()" [disabled]="editBusy()"
+            class="flex-1 inline-flex items-center justify-center gap-1 px-4 py-2 bg-white text-gray-600 border border-gray-300 rounded-base
+                   hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+            ← Anterior
+          </button>
+        }
+
+        @if (editStep() < 3) {
+          <button type="button" (click)="nextStep()" [disabled]="editBusy()"
+            class="flex-1 inline-flex items-center justify-center gap-1 px-4 py-2 bg-cyan-500 hover:bg-cyan-600 text-white font-medium rounded-base
+                   disabled:opacity-50 disabled:cursor-not-allowed">
+            Siguiente →
+          </button>
+        } @else {
+          <button type="button" (click)="updateRegistro()" [disabled]="editBusy()"
+            class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 bg-cyan-500 hover:bg-cyan-600 text-white font-medium rounded-base
+                   disabled:opacity-50 disabled:cursor-not-allowed">
+            @if (editBusy()) {
+              <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25"/>
+                <path fill="currentColor" class="opacity-75" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+              </svg>
+              Guardando...
+            } @else {
+              Guardar cambios
+            }
+          </button>
+        }
+
+      </div>
+
+    </div>
+  </div>
+</div>
+}

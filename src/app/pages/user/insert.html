@@ -1,0 +1,124 @@
+<form [formGroup]="form" (ngSubmit)="submit()" class="grid grid-cols-1 sm:grid-cols-2 gap-y-8 sm:gap-y-10 sm:gap-x-8 md:gap-x-10 w-full max-w-full" novalidate>
+  <div class="space-y-6">
+    <div>
+      <label for="sNombre" class="block text-sm text-body mb-1">Nombre (s)</label>
+      <input id="sNombre" formControlName="sNombre" type="text"
+        class="block w-full px-3 py-2 bg-neutral-secondary-medium border border-default-medium text-body text-sm rounded-base focus:ring-brand focus:border-brand shadow-xs" />
+      @if (showError('sNombre', 'required')) {
+        <p class="text-xs text-red-600 mt-1">El nombre es obligatorio</p>
+      }
+    </div>
+
+    <div>
+      <label for="sApellidoPaterno" class="block text-sm text-body mb-1">Apellido Paterno</label>
+      <input id="sApellidoPaterno" formControlName="sApellidoPaterno" type="text"
+        class="block w-full px-3 py-2 bg-neutral-secondary-medium border border-default-medium text-body text-sm rounded-base focus:ring-brand focus:border-brand shadow-xs" />
+      @if (showError('sApellidoPaterno', 'required')) {
+        <p class="text-xs text-red-600 mt-1">El apellido paterno es obligatorio</p>
+      }
+    </div>
+
+    <div>
+      <label for="sApellidoMaterno" class="block text-sm text-body mb-1">Apellido Materno</label>
+      <input id="sApellidoMaterno" formControlName="sApellidoMaterno" type="text"
+        class="block w-full px-3 py-2 bg-neutral-secondary-medium border border-default-medium text-body text-sm rounded-base focus:ring-brand focus:border-brand shadow-xs" />
+      @if (showError('sApellidoMaterno', 'required')) {
+        <p class="text-xs text-red-600 mt-1">El apellido materno es obligatorio</p>
+      }
+    </div>
+
+    <div>
+      <label for="sUsuario" class="block text-sm text-body mb-1">Usuario</label>
+      <input id="sUsuario" formControlName="sUsuario" type="text"
+        class="block w-full px-3 py-2 bg-neutral-secondary-medium border border-default-medium text-body text-sm rounded-base focus:ring-brand focus:border-brand shadow-xs" />
+      @if (showError('sUsuario', 'required')) {
+        <p class="text-xs text-red-600 mt-1">El usuario es obligatorio</p>
+      }
+    </div>
+
+    <div>
+      <label for="rol" class="block text-sm text-body mb-1">Rol</label>
+      <select id="rol" formControlName="idRol"
+        class="block w-full px-3 py-2 bg-neutral-secondary-medium border border-default-medium text-body text-sm rounded-base focus:ring-brand focus:border-brand shadow-xs">
+        <option value="" disabled>Selecciona</option>
+        <option value="1">Admin</option>
+        <option value="2">Usuario</option>
+      </select>
+      @if (showError('idRol', 'required')) {
+        <p class="text-xs text-red-600 mt-1">Selecciona un rol</p>
+      }
+    </div>
+  </div>
+
+  <div class="space-y-6">
+    <div>
+      <label for="area" class="block text-sm text-body mb-1">Área</label>
+      <select id="area" formControlName="idArea"
+        class="block w-full px-3 py-2 bg-neutral-secondary-medium border border-default-medium text-body text-sm rounded-base focus:ring-brand focus:border-brand shadow-xs">
+        <option value="" disabled>Selecciona</option>
+        <option value="1">Ventas</option>
+        <option value="2">PostVenta</option>
+      </select>
+      @if (showError('idArea', 'required')) {
+        <p class="text-xs text-red-600 mt-1">Selecciona un área</p>
+      }
+    </div>
+
+    <div>
+      <label for="sCorreo" class="block text-sm text-body mb-1">Correo</label>
+      <input id="sCorreo" formControlName="sCorreo" type="email"
+        class="block w-full px-3 py-2 bg-neutral-secondary-medium border border-default-medium text-body text-sm rounded-base focus:ring-brand focus:border-brand shadow-xs" />
+      @if (showError('sCorreo', 'required')) {
+        <p class="text-xs text-red-600 mt-1">Ingresa un correo válido</p>
+      }
+      @if (showError('sCorreo', 'email')) {
+        <p class="text-xs text-red-600 mt-1">Ingresa un correo válido</p>
+      }
+    </div>
+
+    <div>
+      <label for="sPassword" class="block text-sm text-body mb-1">Password</label>
+
+      <div class="relative">
+        <input id="sPassword" formControlName="sPassword" [type]="showPassword() ? 'text' : 'password'"
+          class="bg-neutral-secondary-medium border border-default-medium text-body text-sm rounded-base focus:ring-brand focus:border-brand block w-full px-3 py-2 shadow-xs pr-12" />
+
+        <button type="button" class="absolute inset-y-0 right-3 flex items-center text-heading hover:opacity-70"
+          (click)="togglePasswordVisibility()">
+          @if (showPassword()) {
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M13.875 18.825A10.05 10.05 0 0112 19c-4.477 0-8.268-2.943-9.542-7a9.97 9.97 0 012.333-3.972m3.124-2.55A9.953 9.953 0 0112 5c4.477 0 8.268 2.943 9.542 7a9.97 9.97 0 01-1.621 3.019M15 12a3 3 0 00-3-3m0 0a3 3 0 013 3m-3-3L3 3" />
+            </svg>
+          } @else {
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M2.458 12C3.732 7.943 7.523 5 12 5s8.268 2.943 9.542 7c-1.274 4.057-5.065 7-9.542 7s-8.268-2.943-9.542-7z" />
+            </svg>
+          }
+        </button>
+      </div>
+
+      @if (showError('sPassword', 'minlength') || showError('sPassword', 'required')) {
+        <p class="text-xs text-red-600 mt-1">La contraseña debe tener al menos 6 caracteres</p>
+      }
+    </div>
+  </div>
+
+  <div class="col-span-1 sm:col-span-2 pt-2 flex gap-2">
+    @if (showCancel) {
+      <button type="button" [disabled]="busy()"
+        class="flex-1 inline-flex items-center justify-center px-4 py-2 bg-white text-gray-600 border border-gray-300 rounded-base hover:bg-red-50 hover:text-red-700 hover:border-red-300 disabled:opacity-50 disabled:cursor-not-allowed"
+        (click)="cancel.emit()">
+        Cancelar
+      </button>
+    }
+
+    <button type="submit" [disabled]="busy()"
+      class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 bg-cyan-500 hover:bg-cyan-600 text-white font-medium rounded-base disabled:opacity-50 disabled:cursor-not-allowed">
+      @if (busy()) { Guardando... } @else { Guardar datos }
+    </button>
+  </div>
+</form>

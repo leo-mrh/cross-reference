@@ -1,0 +1,343 @@
+<app-menu></app-menu>
+
+<main
+  class="pt-16 sm:pt-[72px] md:pt-[88px] lg:pt-24 pb-6
+         px-4 md:px-8 transition-all duration-300 animate-page"
+  [ngClass]="{
+    'md:ml-72 md:w-[calc(100%-18rem)]':  isSidebarOpen(),
+    'md:ml-20 md:w-[calc(100%-5rem)]' : !isSidebarOpen()
+  }">
+
+  <div class="mt-2 sm:mt-6 mb-8">
+
+    <div class="mb-8">
+      <h1 class="text-2xl font-bold text-gray-800">Cruce de Referencia</h1>
+      <p class="text-sm text-gray-500 mt-1">Consulta números de parte original, sus alternativas y/o equivalencias.</p>
+    </div>
+
+    <div class="grid md:grid-cols-5 gap-6 mb-12">
+
+      <!-- Panel Izquierdo: Instrucciones -->
+      <div class="md:col-span-2 bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-2xl p-6 text-white flex flex-col">
+        <svg class="w-8 h-8 mb-4 text-cyan-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+        </svg>
+        <h2 class="text-lg font-bold mb-2">¿Cómo buscar?</h2>
+        <ul class="space-y-3 text-sm text-cyan-50">
+          <li class="flex items-start gap-2">
+            <span class="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-[11px] font-bold shrink-0 mt-0.5">1</span>
+            Escribe un número de parte o pega varios, uno por línea.
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-[11px] font-bold shrink-0 mt-0.5">2</span>
+            Presiona "Buscar" o la tecla Enter.
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-[11px] font-bold shrink-0 mt-0.5">3</span>
+            Revisa los resultados y exporta a Excel si lo necesitas.
+          </li>
+        </ul>
+        <div class="mt-auto pt-4 text-xs text-cyan-100/80 border-t border-white/10">
+          Puedes buscar hasta cientos de números de parte simultáneamente.
+        </div>
+      </div>
+
+      <!-- Panel Derecho: Formulario -->
+      <div class="md:col-span-3 bg-white border border-gray-100 rounded-2xl shadow-sm p-6 flex flex-col">
+        <label
+          class="block mb-2 text-sm font-semibold text-gray-700"
+          for="batch-input">
+          Material
+        </label>
+
+        <textarea
+          #batchInput
+          id="batch-input"
+          rows="6"
+          (input)="onBatchInput(batchInput)"
+          (keydown)="onBatchKeydown($event, batchInput.value)"
+          placeholder="Ej: A6853230000&#10;16-16781-000&#10;HLD 90045504"
+          [attr.aria-invalid]="!!batchError()"
+          [attr.aria-describedby]="batchError() ? 'batch-error' : null"
+          class="flex-1 block w-full p-3 bg-gray-50 border border-gray-200 text-gray-800 text-sm
+                 rounded-xl focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 outline-none
+                 placeholder:text-gray-400 resize-none overflow-y-auto transition-shadow"
+        ></textarea>
+
+        @if (batchError()) {
+          <div id="batch-error" role="alert"
+               class="mt-3 flex items-center gap-2 px-3 py-2 text-xs font-semibold
+                      text-red-700 bg-red-50 border border-red-100 rounded-lg">
+            <svg class="w-3.5 h-3.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+            </svg>
+            {{ batchError() }}
+          </div>
+        }
+
+        <div class="flex gap-3 mt-4">
+          <button
+            type="button"
+            id="batch-start"
+            class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold
+                   text-white bg-gradient-to-r from-cyan-500 to-cyan-600 rounded-xl
+                   hover:from-cyan-600 hover:to-cyan-700 shadow-md shadow-cyan-500/20
+                   transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none"
+            [disabled]="batchBusy()"
+            [attr.aria-busy]="batchBusy()"
+            (click)="startBatchSearch(batchInput.value)">
+            @if (batchBusy()) {
+              <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25"/>
+                <path fill="currentColor" class="opacity-75" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+              </svg>
+              <span>Buscando...</span>
+            } @else {
+              <span>Buscar</span>
+            }
+          </button>
+
+          <button
+            type="button"
+            id="batch-cancel"
+            class="inline-flex items-center justify-center px-4 py-2.5 text-sm font-semibold
+                   text-gray-600 bg-white border border-gray-200 rounded-xl
+                   hover:bg-gray-50 transition-colors
+                   disabled:opacity-40 disabled:cursor-not-allowed"
+            [disabled]="!batchBusy() && !batchInput.value.trim()"
+            (click)="openCancelConfirm()">
+            {{ batchBusy() ? 'Cancelar' : 'Limpiar' }}
+          </button>
+        </div>
+
+        <!-- Progreso -->
+        @if (batchProgress().total > 0) {
+          <div class="pt-4 mt-2 border-t border-gray-100" aria-live="polite">
+            <div class="flex items-center justify-between text-[11px] font-semibold uppercase tracking-wide text-gray-400 mb-2">
+              <span>Progreso</span>
+              <span>{{ batchProgress().processed }} / {{ batchProgress().total }}</span>
+            </div>
+            <div class="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
+              <div
+                class="bg-gradient-to-r from-cyan-500 to-cyan-600 h-full transition-all duration-300 rounded-full"
+                [style.width.%]="batchProgress().total > 0 ? (batchProgress().processed / batchProgress().total * 100) : 0">
+              </div>
+            </div>
+          </div>
+        }
+
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Modal: Cancelar búsqueda -->
+<app-modal
+  [open]="cancelConfirmOpen()"
+  modalTitle="Cancelar búsqueda"
+  maxWidth="sm"
+  [dismissOnBackdrop]="false"
+  (closed)="closeCancelConfirm()">
+
+  <div class="p-6 space-y-4">
+    <p class="text-sm text-gray-700">
+      ¿Deseas cancelar la búsqueda y eliminar los registros ingresados?
+    </p>
+    <p class="text-xs text-gray-500">
+      Esta acción detendrá el proceso en curso y limpiará el contenido del campo de búsqueda.
+    </p>
+  </div>
+
+  <div footer-actions class="flex items-center gap-2">
+    <button
+      type="button"
+      class="inline-flex items-center justify-center px-4 py-2 bg-white text-gray-600
+             border border-gray-300 rounded-xl hover:bg-red-50 hover:text-red-700
+             hover:border-red-300 transition-colors"
+      (click)="closeCancelConfirm()">
+      No, volver
+    </button>
+    <button
+      type="button"
+      class="inline-flex items-center justify-center gap-2 px-4 py-2
+             bg-red-500 hover:bg-red-600 text-white font-medium rounded-xl transition-colors"
+      (click)="confirmCancelBatch()">
+      Sí, cancelar
+    </button>
+  </div>
+</app-modal>
+
+<!-- Modal: Resultados de Búsqueda -->
+<app-modal
+  [open]="showModal()"
+  modalTitle="Resultados de Búsqueda"
+  maxWidth="7xl"
+  [dismissOnBackdrop]="false"
+  [revealOnScroll]="true"
+  (closed)="closeModal()">
+
+  @if (batchSummary()) {
+    <div footer-info class="flex items-center gap-4">
+
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-lg bg-emerald-100 flex items-center justify-center shrink-0">
+          <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+          </svg>
+        </div>
+        <div class="flex flex-col leading-tight">
+          <span class="text-lg font-bold text-gray-800">{{ batchSummary()!.ok }}</span>
+          <span class="text-[11px] text-gray-500 font-medium">Encontrados</span>
+        </div>
+      </div>
+
+      <div class="w-px h-8 bg-gray-200"></div>
+
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-lg bg-red-100 flex items-center justify-center shrink-0">
+          <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </div>
+        <div class="flex flex-col leading-tight">
+          <span class="text-lg font-bold text-gray-800">{{ batchSummary()!.failed }}</span>
+          <span class="text-[11px] text-gray-500 font-medium">Fallidos</span>
+        </div>
+      </div>
+
+    </div>
+  }
+
+  <div footer-actions class="flex items-center gap-2">
+    <button
+      type="button"
+      class="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white
+             bg-gradient-to-r from-cyan-500 to-cyan-600 rounded-xl
+             hover:from-cyan-600 hover:to-cyan-700
+             shadow-md shadow-cyan-500/20 hover:shadow-lg hover:shadow-cyan-500/30
+             transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none"
+      [disabled]="batchRows().length === 0"
+      (click)="downloadBatchExcel()">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+      </svg>
+      Exportar Excel
+    </button>
+  </div>
+
+  <!-- Listado tipo tarjetas -->
+  <div class="space-y-4">
+    @for (row of batchRows(); track row.id; let i = $index) {
+
+      @let alts    = preprocessAlternatives(row);
+      @let rowNota = getNotaForRow(row);
+
+      <div
+        class="group relative rounded-2xl border border-gray-100 bg-white p-4
+               transition-all hover:border-cyan-200 hover:shadow-md"
+        [class.border-red-100]="rowNota.tipo !== 'ok'"
+        [class.bg-red-50/30]="rowNota.tipo !== 'ok'">
+
+        <div class="flex items-start gap-4">
+
+          <!-- Índice circular -->
+          <div class="shrink-0 w-8 h-8 rounded-full bg-gray-100 group-hover:bg-cyan-100
+                      flex items-center justify-center text-xs font-bold
+                      text-gray-500 group-hover:text-cyan-700 transition-colors">
+            {{ i + 1 }}
+          </div>
+
+          <div class="flex-1 min-w-0 space-y-2.5">
+
+            <!-- Número de Parte -->
+            <div>
+              <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-0.5">
+                Número de Parte
+              </p>
+              <div class="flex items-center justify-between gap-3">
+                <span class="font-mono font-bold text-gray-800 text-[15px] tracking-tight">
+                  {{ row.numParteOem }}
+                </span>
+                @if (rowNota.tipo !== 'ok') {
+                  <span
+                    class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full
+                           text-[10px] font-bold uppercase tracking-wide shrink-0"
+                    [ngClass]="rowNota.color">
+                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                    </svg>
+                    {{ rowNota.mensaje }}
+                  </span>
+                }
+              </div>
+            </div>
+
+            <!-- Descripción -->
+            <div>
+              <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-0.5">
+                Descripción
+              </p>
+              <p class="text-sm text-gray-600 truncate">
+                {{ row.descripcion || 'Sin descripción disponible' }}
+              </p>
+            </div>
+
+            <!-- Alternativas -->
+            @if (rowNota.tipo === 'ok' && alts.length > 0) {
+              <div>
+                <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1">
+                  Alternativas
+                </p>
+                <div class="flex flex-wrap gap-1.5">
+                  @for (a of alts; track $index) {
+                    <span
+                      class="relative group/tooltip inline-flex items-center gap-1.5 px-2.5 py-1
+                             rounded-lg text-[12px] font-medium whitespace-pre
+                             bg-gray-50 text-gray-600 border border-gray-200
+                             hover:bg-gray-100 transition-colors"
+                      [class.cursor-help]="a.nota.tipo !== 'ok' && a.nota.mensaje"
+                      [class.bg-cyan-50]="a.nota.tipo !== 'ok' && a.nota.mensaje"
+                      [class.border-cyan-200]="a.nota.tipo !== 'ok' && a.nota.mensaje"
+                      [class.text-cyan-700]="a.nota.tipo !== 'ok' && a.nota.mensaje">
+
+                      {{ a.altLabel }}
+
+                      @if (a.nota.tipo !== 'ok' && a.nota.mensaje) {
+                        <svg class="w-3.5 h-3.5 text-cyan-500 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                        </svg>
+                        <span
+                          class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2
+                                 hidden group-hover/tooltip:flex flex-col items-center z-[999]
+                                 opacity-0 group-hover/tooltip:opacity-100 transition-opacity duration-150">
+                          <span class="px-3 py-1.5 text-xs font-medium text-white bg-cyan-600
+                                       rounded-lg shadow-xl whitespace-normal max-w-[220px] text-center">
+                            {{ a.nota.mensaje }}
+                          </span>
+                          <span class="w-2 h-2 -mt-1 rotate-45 bg-cyan-600"></span>
+                        </span>
+                      }
+                    </span>
+                  }
+                </div>
+              </div>
+            }
+
+          </div>
+        </div>
+      </div>
+
+    } @empty {
+      <div class="flex flex-col items-center justify-center gap-3 py-20 text-gray-400">
+        <div class="w-16 h-16 rounded-2xl bg-gray-50 flex items-center justify-center">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+        </div>
+        <p class="text-sm font-semibold text-gray-500">No se encontraron resultados</p>
+        <p class="text-xs text-gray-400">Intenta con otros números de parte</p>
+      </div>
+    }
+  </div>
+
+</app-modal>

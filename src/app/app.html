@@ -1,0 +1,13 @@
+<div class="min-h-screen flex flex-col">
+  @if (showNavbar()) {
+    <app-navbar></app-navbar>
+  }
+
+  <main class="flex-grow">
+    <router-outlet />
+  </main>
+
+  @if (showNavbar()) {
+    <app-footer></app-footer>
+  }
+</div>

@@ -1,0 +1,10 @@
+<footer 
+  class="px-0 bg-neutral-primary border-t border-default transition-all duration-200 w-full"
+  [ngClass]="{
+    'md:ml-72 md:w-[calc(100%-18rem)]': isSidebarOpen(),
+    'md:ml-20 md:w-[calc(100%-5rem)]': !isSidebarOpen()
+  }">
+    <div class="px-4 py-3 flex items-center justify-center">
+        <span class="block text-sm text-body sm:text-center">© 2026 <a href="/" class="hover:underline">Daimler Buses México™</a>. Todos los derechos reservados.</span>
+    </div>
+</footer>

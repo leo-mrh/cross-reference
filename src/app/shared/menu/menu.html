@@ -1,0 +1,285 @@
+<!-- Mobile Backdrop -->
+<div
+  class="fixed inset-0 bg-black/50 z-30 transition-opacity duration-300 md:hidden backdrop-blur-sm"
+  aria-hidden="true"
+  [class.opacity-100]="isSidebarOpen()"
+  [class.opacity-0]="!isSidebarOpen()"
+  [class.pointer-events-none]="!isSidebarOpen()"
+  (click)="toggleSidebar()">
+</div>
+
+<!-- Sidebar -->
+<aside
+  aria-label="Navegación lateral"
+  class="fixed top-16 sm:top-[72px] md:top-[88px] lg:top-24
+         h-[calc(100vh-64px)] sm:h-[calc(100vh-72px)] md:h-[calc(100vh-88px)] lg:h-[calc(100vh-96px)]
+         w-full sm:w-80 bg-white border-r border-gray-100
+         z-40 transform transition-all duration-300
+         -translate-x-full md:translate-x-0
+         overflow-y-auto overflow-x-hidden
+         shadow-2xl md:shadow-none"
+  [class.translate-x-0]="isSidebarOpen()"
+  [class.md:w-72]="isSidebarOpen()"
+  [class.md:w-20]="!isSidebarOpen()">
+
+  <!-- Sidebar Header -->
+  <div
+    class="p-4 flex justify-between items-center border-b border-gray-50
+           md:sticky md:top-0 md:bg-white md:z-10"
+    [class.md:justify-center]="!isSidebarOpen()">
+
+    <span
+      class="text-gray-400 font-bold text-xs uppercase tracking-widest ml-2 transition-opacity duration-300"
+      [class.md:hidden]="!isSidebarOpen()">
+      Menú Principal
+    </span>
+
+    <!-- Close button (mobile only) -->
+    <button
+      type="button"
+      (click)="toggleSidebar()"
+      class="p-2 -mr-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-full transition-colors md:hidden"
+      aria-label="Cerrar menú">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+      </svg>
+    </button>
+
+    <!-- Collapse button (desktop only) -->
+    <button
+      type="button"
+      (click)="toggleSidebar()"
+      class="hidden md:block text-gray-400 hover:text-gray-600 transition-all duration-300"
+      [class.rotate-180]="!isSidebarOpen()"
+      [attr.aria-label]="isSidebarOpen() ? 'Colapsar menú' : 'Expandir menú'">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Navigation -->
+  <nav aria-label="Menú principal" class="mt-2 pb-20 md:pb-0">
+
+    <!-- Inicio -->
+    <a
+      routerLink="/home"
+      routerLinkActive="bg-sky-50 border-l-4 border-sky-500 text-sky-700"
+      [routerLinkActiveOptions]="{ exact: true }"
+      class="flex items-center gap-4 px-6 py-4 md:py-3 text-gray-600
+             hover:bg-gray-50 transition-all group border-l-4 border-transparent"
+      [class.md:px-0]="!isSidebarOpen()"
+      [class.md:justify-center]="!isSidebarOpen()">
+      <div class="w-10 h-10 md:w-6 md:h-6 flex items-center justify-center bg-gray-50 md:bg-transparent rounded-lg shrink-0">
+        <svg class="w-6 h-6 md:w-5 md:h-5 group-hover:scale-110 transition-transform"
+             fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+        </svg>
+      </div>
+      <span
+        class="font-medium text-base md:text-sm transition-opacity duration-300"
+        [class.md:hidden]="!isSidebarOpen()">
+        Inicio
+      </span>
+    </a>
+
+    <!-- Cross Reference (Collapsible) -->
+    <div class="relative">
+      <button
+        type="button"
+        (click)="onToggleCruce()"
+        [attr.aria-expanded]="isCruceOpen() && isSidebarOpen()"
+        aria-controls="cruce-submenu"
+        class="w-full flex items-center justify-between gap-4 px-6 py-4 md:py-3
+               text-gray-600 hover:bg-gray-50 transition-all group border-l-4 border-transparent"
+        [class.bg-gray-50]="isCruceOpen()"
+        [class.text-sky-700]="isCruceOpen()"
+        [class.md:px-0]="!isSidebarOpen()"
+        [class.md:justify-center]="!isSidebarOpen()">
+        <div class="flex items-center gap-4">
+          <div class="w-10 h-10 md:w-6 md:h-6 flex items-center justify-center bg-gray-50 md:bg-transparent rounded-lg shrink-0">
+            <svg class="w-6 h-6 md:w-5 md:h-5 group-hover:scale-110 transition-transform"
+                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+            </svg>
+          </div>
+          <span
+            class="font-medium text-base md:text-sm transition-opacity duration-300"
+            [class.md:hidden]="!isSidebarOpen()">
+            Cross Reference
+          </span>
+        </div>
+        <svg
+          class="w-4 h-4 transition-transform duration-200"
+          [class.rotate-180]="isCruceOpen()"
+          [class.md:hidden]="!isSidebarOpen()"
+          fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+        </svg>
+      </button>
+
+      <div
+        id="cruce-submenu"
+        class="overflow-hidden transition-all duration-300 bg-gray-50/50"
+        [class.max-h-0]="!isCruceOpen() || !isSidebarOpen()"
+        [class.max-h-96]="isCruceOpen() && isSidebarOpen()">
+
+        <a routerLink="/show" routerLinkActive="text-sky-600 font-bold"
+           class="flex items-center gap-4 pl-16 py-4 md:py-3 text-base md:text-sm
+                  text-gray-500 hover:text-sky-600 hover:bg-sky-50/50 transition-colors">
+          <span class="w-2 h-2 md:w-1.5 md:h-1.5 rounded-full bg-current shrink-0"></span>
+          Consulta
+        </a>
+
+        @if (userRole() === 'admin') {
+          <a routerLink="/list" routerLinkActive="text-sky-600 font-bold"
+             class="flex items-center gap-4 pl-16 py-4 md:py-3 text-base md:text-sm
+                    text-gray-500 hover:text-sky-600 hover:bg-sky-50/50 transition-colors">
+            <span class="w-2 h-2 md:w-1.5 md:h-1.5 rounded-full bg-current shrink-0"></span>
+            Listado
+          </a>
+          <a routerLink="/create" routerLinkActive="text-sky-600 font-bold"
+             class="flex items-center gap-4 pl-16 py-4 md:py-3 text-base md:text-sm
+                    text-gray-500 hover:text-sky-600 hover:bg-sky-50/50 transition-colors">
+            <span class="w-2 h-2 md:w-1.5 md:h-1.5 rounded-full bg-current shrink-0"></span>
+            Insertar
+          </a>
+        }
+      </div>
+    </div>
+
+
+
+    <!-- Kits de Reparación (Admin only, Collapsible) -->
+    @if (userRole() === 'admin') {
+      <div class="relative">
+        <button
+          type="button"
+          (click)="onToggleKits()"
+          [attr.aria-expanded]="isKitsOpen() && isSidebarOpen()"
+          aria-controls="kits-submenu"
+          class="w-full flex items-center justify-between gap-4 px-6 py-4 md:py-3
+                 text-gray-600 hover:bg-gray-50 transition-all group border-l-4 border-transparent"
+          [class.bg-gray-50]="isKitsOpen()"
+          [class.text-sky-700]="isKitsOpen()"
+          [class.md:px-0]="!isSidebarOpen()"
+          [class.md:justify-center]="!isSidebarOpen()">
+          <div class="flex items-center gap-4">
+            <div class="w-10 h-10 md:w-6 md:h-6 flex items-center justify-center bg-gray-50 md:bg-transparent rounded-lg shrink-0">
+              <svg class="w-6 h-6 md:w-5 md:h-5 group-hover:scale-110 transition-transform"
+                   fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+              </svg>
+            </div>
+            <span
+              class="font-medium text-base md:text-sm transition-opacity duration-300"
+              [class.md:hidden]="!isSidebarOpen()">
+              Kits de Reparación
+            </span>
+          </div>
+          <svg
+            class="w-4 h-4 transition-transform duration-200"
+            [class.rotate-180]="isKitsOpen()"
+            [class.md:hidden]="!isSidebarOpen()"
+            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </button>
+
+        <div
+          id="kits-submenu"
+          class="overflow-hidden transition-all duration-300 bg-gray-50/50"
+          [class.max-h-0]="!isKitsOpen() || !isSidebarOpen()"
+          [class.max-h-96]="isKitsOpen() && isSidebarOpen()">
+          <a routerLink="/kits-reparacion/insert" routerLinkActive="text-sky-600 font-bold"
+             class="flex items-center gap-4 pl-16 py-4 md:py-3 text-base md:text-sm
+                    text-gray-500 hover:text-sky-600 hover:bg-sky-50/50 transition-colors">
+            <span class="w-2 h-2 md:w-1.5 md:h-1.5 rounded-full bg-current shrink-0"></span>
+            Insertar
+          </a>
+        </div>
+      </div>
+    }
+
+        <!-- Usuarios (Admin only, Collapsible) -->
+    @if (userRole() === 'admin') {
+      <div class="relative">
+        <button
+          type="button"
+          (click)="onToggleUsuarios()"
+          [attr.aria-expanded]="isUsuariosOpen() && isSidebarOpen()"
+          aria-controls="usuarios-submenu"
+          class="w-full flex items-center justify-between gap-4 px-6 py-4 md:py-3
+                 text-gray-600 hover:bg-gray-50 transition-all group border-l-4 border-transparent"
+          [class.bg-gray-50]="isUsuariosOpen()"
+          [class.text-sky-700]="isUsuariosOpen()"
+          [class.md:px-0]="!isSidebarOpen()"
+          [class.md:justify-center]="!isSidebarOpen()">
+          <div class="flex items-center gap-4">
+            <div class="w-10 h-10 md:w-6 md:h-6 flex items-center justify-center bg-gray-50 md:bg-transparent rounded-lg shrink-0">
+              <svg class="w-6 h-6 md:w-5 md:h-5 group-hover:scale-110 transition-transform"
+                   fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+              </svg>
+            </div>
+            <span
+              class="font-medium text-base md:text-sm transition-opacity duration-300"
+              [class.md:hidden]="!isSidebarOpen()">
+              Usuarios
+            </span>
+          </div>
+          <svg
+            class="w-4 h-4 transition-transform duration-200"
+            [class.rotate-180]="isUsuariosOpen()"
+            [class.md:hidden]="!isSidebarOpen()"
+            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </button>
+
+        <div
+          id="usuarios-submenu"
+          class="overflow-hidden transition-all duration-300 bg-gray-50/50"
+          [class.max-h-0]="!isUsuariosOpen() || !isSidebarOpen()"
+          [class.max-h-96]="isUsuariosOpen() && isSidebarOpen()">
+          <a routerLink="/user" routerLinkActive="text-sky-600 font-bold"
+             class="flex items-center gap-4 pl-16 py-4 md:py-3 text-base md:text-sm
+                    text-gray-500 hover:text-sky-600 hover:bg-sky-50/50 transition-colors">
+            <span class="w-2 h-2 md:w-1.5 md:h-1.5 rounded-full bg-current shrink-0"></span>
+            Listado
+          </a>
+        </div>
+      </div>
+    }
+
+    <!-- Ajustes -->
+    <div class="mt-4 pt-4 border-t border-gray-50">
+      <button
+        type="button"
+        class="w-full flex items-center gap-4 px-6 py-4 md:py-3
+               text-gray-600 hover:bg-gray-50 transition-all group border-l-4 border-transparent"
+        [class.md:px-0]="!isSidebarOpen()"
+        [class.md:justify-center]="!isSidebarOpen()">
+        <div class="w-10 h-10 md:w-6 md:h-6 flex items-center justify-center bg-gray-50 md:bg-transparent rounded-lg shrink-0">
+          <svg class="w-6 h-6 md:w-5 md:h-5 group-hover:rotate-45 transition-transform"
+               fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+          </svg>
+        </div>
+        <span
+          class="font-medium text-base md:text-sm transition-opacity duration-300"
+          [class.md:hidden]="!isSidebarOpen()">
+          Ajustes
+        </span>
+      </button>
+    </div>
+
+  </nav>
+</aside>

@@ -1,0 +1,56 @@
+<div class="grid grid-cols-1 md:grid-cols-2 gap-10 max-w-4xl mx-auto mt-30 px-6 animate-page">
+  <div class="space-y-4">
+    <h1 class="text-2xl font-bold">Detalle de Refacción</h1>
+
+    <div>
+      <label for="numPiezaOem" class="block mb-2.5 text-sm font-medium text-heading">Número de Parte (OEM)</label>
+      <input name="numPiezaOem" id="numPiezaOem" type="text" disabled
+        class="bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base block w-full px-3 py-2.5 shadow-xs" />
+    </div>
+
+
+
+    <!-- Contenedor para alternativas dinámicas -->
+    <div id="alternativas-container"></div>
+
+    <div>
+      <label for="valueParts" class="block mb-2.5 text-sm font-medium text-heading">Value Parts</label>
+      <input name="valueParts" id="valueParts" type="text" disabled
+        class="bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base block w-full px-3 py-2.5 shadow-xs" />
+    </div>
+
+    <div>
+      <label for="reman" class="block mb-2.5 text-sm font-medium text-heading">Reman</label>
+      <input name="reman" id="reman" type="text" disabled
+        class="bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base block w-full px-3 py-2.5 shadow-xs" />
+    </div>
+
+    <div>
+      <label for="dde" class="block mb-2.5 text-sm font-medium text-heading">DDE</label>
+      <input name="dde" id="dde" type="text" disabled
+        class="bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base block w-full px-3 py-2.5 shadow-xs" />
+    </div>
+  </div>
+
+  <div class="space-y-4 mt-12">
+    <div>
+      <label for="mbf" class="block mb-2.5 text-sm font-medium text-heading">MBF</label>
+      <input name="mbf" id="mbf" type="text" disabled
+        class="bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base block w-full px-3 py-2.5 shadow-xs" />
+    </div>
+
+    <div>
+      <label for="descripcion" class="block mb-2.5 text-sm font-medium text-heading">Descripción</label>
+      <textarea name="descripcion" id="descripcion" rows="4" disabled
+        class="bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base block w-full p-3.5 shadow-xs"></textarea>
+    </div>
+
+    <div class="space-y-2">
+      <label class="block text-sm font-medium text-heading">Imagen</label>
+      <img id="img_preview" alt="imagen" class="h-24 w-24 object-contain rounded border border-default-medium cursor-zoom-in" />
+    </div>
+    <div id="view-image-modal" class="fixed inset-0 z-50 bg-black/60 hidden items-center justify-center">
+      <img id="view_image_large" alt="imagen ampliada" class="max-h-[70vh] max-w-[60vw] object-contain rounded shadow-lg" />
+    </div>
+  </div>
+</div>
